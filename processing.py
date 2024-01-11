@@ -13,7 +13,7 @@ from nltk.stem import SnowballStemmer
 import re
 from pymystem3 import Mystem
 from pymorphy3 import MorphAnalyzer
-import matplotlib.pyplot as plt
+
 import time
 
 
@@ -40,18 +40,6 @@ def LemmatizeMorphWord(token,morph=MorphAnalyzer()):
 def LemmatizeMorphText(text):#выделение схожих слов
     return [LemmatizeMorphWord(w) for w in text]
 
-def CountWord(text):#вывод графика и чистоты слова    
-    
-    fdist = FreqDist(text)
-    #plt.title('Cлова и количество их в тексте до обработки')
-    #plt.title('Cлова и количество их в тексте после удаления символов')
-    #plt.title('Cлова и количество их в тексте после удаления стоп-слов')
-    #plt.title('Cлова и количество их в тексте после Лемматизации с помощью библиотеки pymystem3')
-    #plt.title('Cлова и количество их в тексте после Лемматизации с помощью библиотеки pymorphy3')
-    plt.title('Cлова и количество их в тексте после Лематизации и Стемминга ')
-    fdist.plot(30,cumulative=False)
-    
-    plt.show()
 
 def SumRe(text):#удаление символов и понижение регистров
     text=re.sub(r'[0123456789+]','',text)
@@ -65,22 +53,21 @@ def SumRe(text):#удаление символов и понижение рег�
 
 def Token(text):#выделение токенов
     #print(stopw)
-    tic = time.perf_counter()
     
-    text=SumRe(text)
+    if (text is not None):
+        tic = time.perf_counter()
+        text=SumRe(text)
     
-    text=[w for w in text if not w in stopw and len(w)>3]
-    text=LemmatizeMorphText(text)
-    text=LemmatizeMystem(text)
+        text=[w for w in text if not w in stopw and len(w)>3]
+        text=LemmatizeMorphText(text)
+        text=LemmatizeMystem(text)
     
-    text=Steemm(text)
+        text=Steemm(text)
     
-    #CountWord(text)
-    
-    text=' '.join(text)
-    #print(text)
-    toc = time.perf_counter()
-    print(f"Вычисление заняло {toc - tic:0.4f} секунд")
+        text=' '.join(text)
+        #print(text)
+        toc = time.perf_counter()
+        print(f"Вычисление заняло {toc - tic:0.4f} секунд")
     return text
     
     

@@ -26,9 +26,12 @@ def AbsolutePath(path):#обход по папкам
     artext=[]   
     for dirs,folden,files in os.walk(path):
         for file in files:                    
-            p=os.path.splitext(file)        
-            artext.append(Data(dirs,file,p))
-            indexfile.append(file)
+            p=os.path.splitext(file)
+            predfile=Data(dirs,file,p)
+            if ( predfile is not None):               
+                artext.append(predfile)
+                indexfile.append(file)
+                predfile=None
     #
     #bow_cv=CountVector(artext)
     #bow_cv_df = pd.DataFrame(data = bow_cv.toarray(),    # таблица
