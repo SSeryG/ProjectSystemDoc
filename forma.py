@@ -42,24 +42,24 @@ class window(QWidget):
        self.TextEdit2 = QLineEdit(self)
        self.TextEdit2.setFont(QFont('Arial',8))
        self.TextEdit2.move(40, 190)
-       self.TextEdit2.resize(200,20)    
+       self.TextEdit2.resize(200,20)
 
        self.openDirButton2 = QPushButton(self)
-       self.openDirButton2.setIcon(QIcon('icondir.svg'))      
+       self.openDirButton2.setIcon(QIcon('icondir.svg'))
        self.openDirButton2.move(240, 190) 
-       self.openDirButton2.resize(20,20) 
-       self.openDirButton2.clicked.connect(self.getDirectory2) 
+       self.openDirButton2.resize(20,20)
+       self.openDirButton2.clicked.connect(self.getDirectory2)
 
 
        self.PuskButton = QPushButton(self)
-       #self.PuskButton.setIcon()      
+       #self.PuskButton.setIcon()
        self.PuskButton.move(50, 300) 
        self.PuskButton.resize(200,20) 
        self.PuskButton.clicked.connect(self.PuskClic) 
             
        
 
-    def getDirectory(self):                                                     
+    def getDirectory(self):      
        dirlist = QFileDialog.getExistingDirectory(self,"Выбрать папку",".")
        self.TextEdit1.setText(dirlist)
 

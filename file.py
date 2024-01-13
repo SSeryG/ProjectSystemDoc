@@ -1,7 +1,7 @@
 from read import ReadPdf,ReadDoc,ReadDocx
 import pandas as pd
 from IPython.display import display
-from clusters import CountVector,token,TFidf,TFdfVector,ClusterBirch
+from clusters import CountVector,token,TFidf,TFdfVector,Cluster
 import os
 import asyncio
 import time
@@ -42,7 +42,7 @@ def AbsolutePath(path):#обход по папкам
     bow_tf=TFdfVector(artext)
 
     
-    #print(klast)
+    Cluster(bow_tf)
     
     #print(klast)
     

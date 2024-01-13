@@ -2,6 +2,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.cluster.hierarchy import ward, dendrogram, fcluster,linkage
+from scipy.cluster.hierarchy import complete, average, single,weighted
+from scipy.cluster.hierarchy import centroid, median
 from scipy.spatial.distance import pdist
 import pandas as pd
 from nltk import ngrams
@@ -13,7 +15,7 @@ import matplotlib.pyplot as plt
 tokens=[]
 
 def CountVector(artext):#построенние вектора
-    vec=CountVectorizer(ngram_range=(2,3),lowercase=False)
+    vec=CountVectorizer(ngram_range=(2,3))
     bow=vec.fit_transform(artext)
     print(bow.toarray())
     print(bow.shape)
@@ -37,30 +39,88 @@ def TFdfVector(artext):#построение и вычисление часто�
     print(df_tfidf)
     return df_tfidf
     
-def ClusterBirch(X,indexfile):
+def Cluster(X):
     #samples = X.value
     y=pdist(X)
     y_ward=ward(y)
-    print(fcluster(y_ward,1.25,criterion='distance'))
-    print()
-    print(fcluster(y_ward,1.3,criterion='distance'))
-    print()
-    print(fcluster(y_ward,1.35,criterion='distance'))
-    print()
-    print(fcluster(y_ward,1.4,criterion='distance'))
-    print()
-    print(fcluster(y_ward,1.45,criterion='distance'))
-    print()
-    print(fcluster(y_ward,1.5,criterion='distance'))
-    
-    
-    Z = linkage(y, 'ward')  
+    Z = linkage(y_ward, 'ward')  
     
     plt.figure(figsize=(25, 10))    
-    plt.xlabel(indexfile)
+    
     dn = dendrogram(Z)
     
     plt.show()
+
+    y_average=average(y)
+    Z = linkage(y_average, 'average')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    plt.show()
+
+    y_complete=complete(y)
+    
+    Z = linkage(y_complete, 'complete')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    plt.show()
+    y_single=single(y)
+    Z = linkage(y_single, 'single')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    plt.show()
+
+    y_weighted=weighted(y)
+
+    Z = linkage(y_weighted, 'weighted')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    plt.show()
+    y_centroid=centroid(y)
+    Z = linkage(y_centroid, 'centroid')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    plt.show()
+    y_median=median(y)    
+    
+    
+    
+    Z = linkage(X, 'median')  
+    
+    plt.figure(figsize=(25, 10))    
+    
+    dn = dendrogram(Z)
+    
+    
+
+    print(fcluster(y_ward,1.5,criterion='distance'))
+    print()
+    print(fcluster(y_average,1.5,criterion='distance'))
+    print()
+    print(fcluster(y_complete,1.5,criterion='distance'))
+    print()
+    print(fcluster(y_single,1.5,criterion='distance'))
+    print()
+    print(fcluster(y_weighted,1.5,criterion='distance'))
+    print()
+    print(fcluster( y_centroid,1.5,criterion='distance'))
+    print()
+    print(fcluster( y_centroid,1.5,criterion='distance'))
+    print()
 
 
     #samples['cluster']=fcluster(mergings,1.5,criterion='distance')
