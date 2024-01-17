@@ -57,8 +57,9 @@ def Token(text):#выделение токенов
     if (text is not None):
         tic = time.perf_counter()
         text=SumRe(text)
-    
+               
         text=[w for w in text if not w in stopw and len(w)>3]
+        print(text) 
         text=LemmatizeMorphText(text)
         text=LemmatizeMystem(text)
     
