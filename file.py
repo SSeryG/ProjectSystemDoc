@@ -1,7 +1,7 @@
 from read import ReadPdf,ReadDoc,ReadDocx
 import pandas as pd
 from IPython.display import display
-from clusters import CountVector,token,TFidf,TFdfVector,Cluster
+from clusters import TFidfVector,Cluster
 import os
 import asyncio
 import time
@@ -9,40 +9,69 @@ import time
 
 
 
-def Data(dirs,file,p):#прочтение документов
+def Data(file,p):#прочтение документов
     if (p[1]=='.pdf'):
-        print(file)
-        return ReadPdf(os.path.join(dirs,file))#
+        print(file)  
+        return ReadPdf(file)#
     elif (p[1]=='.docx'):
-        print(file)
-        return ReadDocx(os.path.join(dirs,file))#
-    elif (p[1]=='.doc'):
-        print(file)
-        return ReadDoc(os.path.join(dirs,file))#
+        print(file)  
+        return ReadDocx(file)#
+    elif (p[1]=='.doc'):        
+        print(file)  
+        return ReadDoc(file)#
+
+def Exeption(p):
+    if(p[1]=='.pdf'or p[1]=='.docx'or p[1]=='.doc'):   
+        return True
+    else:
+        return False
     
-def AbsolutePath(path):#обход по папкам
-    tic = time.perf_counter()
-    indexfile=[]
-    artext=[]   
+def WalkDir(path):
+    listfiles=[]
     for dirs,folden,files in os.walk(path):
-        for file in files:                    
-            p=os.path.splitext(file)
-            predfile=Data(dirs,file,p)
-            if ( predfile is not None):               
-                artext.append(predfile)
-                indexfile.append(file)
-                predfile=None
-    #
-    #bow_cv=CountVector(artext)
-    #bow_cv_df = pd.DataFrame(data = bow_cv.toarray(),    # таблица
-    #                    index= indexfile,                #
-    #                    columns = token())    
-    #            #
-    #print(indexfile)
-    bow_tf=TFdfVector(artext)
+        for file in files:          
+            if Exeption(os.path.splitext(file)):
+                listfiles.append(os.path.join(dirs,file))
+    return  listfiles
+
+def ChekingSize(listfile):
+    smallfile=[]
+    bigfile=[]
+    for file in listfile:
+        if os.stat(file).st_size<5242880:
+            smallfile.append(file)
+        else :
+            bigfile.append(file)
+    return (smallfile,bigfile)
+
+def WalkList(List):    
+    artext=[]
+    for file in List:
+        p=os.path.splitext(file)
+        predfile=Data(file,p)
+        if(ChekingNone(List,predfile,file)):
+            artext.append(predfile)
+            predfile=None
+    return artext
+    
+
+def ChekingNone(List,predfile,file):
+    if (predfile is not None):
+        return True
+    else :
+        List.remove(file)
+        return False
 
     
-    Cluster(bow_tf)
+def AbsolutePath(path):#обход по папкам
+    number=1
+    tic = time.perf_counter()
+    listfiles=WalkDir(path)
+    smallfile,bigfile=ChekingSize(listfiles)    
+    artext=WalkList(smallfile)
+    artext1=WalkList(bigfile)
+    bigvector=TFidfVector(artext1)
+    Cluster(TFidfVector(artext),artext1)
     
     #print(klast)
     
@@ -54,6 +83,7 @@ def AbsolutePath(path):#обход по папкам
 def DirectoreDoc(twopath):
     twopath=os.path.join(twopath,'dir')
     os.mkdir(twopath)
+    
 
 #path='F:/'
 #twopath='C:/Users/Сергей/Desktop/reader/dir/dir'
