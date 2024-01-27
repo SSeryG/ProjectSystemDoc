@@ -59,7 +59,11 @@ def Token(text):#выделение токенов
         text=SumRe(text)
                
         text=[w for w in text if not w in stopw and len(w)>3]
+<<<<<<< HEAD
         #print(text) 
+=======
+        print(text) 
+>>>>>>> 26b0df96911c86a4753907f449ddbbd36239bbdf
         text=LemmatizeMorphText(text)
         
     

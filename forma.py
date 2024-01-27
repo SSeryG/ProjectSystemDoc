@@ -4,7 +4,11 @@ from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
 from file import AbsolutePath
+<<<<<<< HEAD
 from file import CreateDirectory
+=======
+from file import DirectoreDoc
+>>>>>>> 26b0df96911c86a4753907f449ddbbd36239bbdf
 
 
 
@@ -75,6 +79,7 @@ class window(QWidget):
       self.TextEdit2.setText(dirlist)
     
    def PuskClic(self):
+<<<<<<< HEAD
       #try:
          strp=self.TextEdit1.text()                                                     
          AbsolutePath(strp)
@@ -96,6 +101,29 @@ class window(QWidget):
    def CreateClic(self):
       strp=self.TextEdit2.text()                                                     
       CreateDirectory(strp)
+=======
+      try:
+         strp=self.TextEdit1.text()                                                     
+         AbsolutePath(strp)
+      except:         
+         window.msg.setIcon(QMessageBox.Information) 
+  
+         # setting message for Message Box 
+         window.msg.setText("Information ") 
+      
+      # setting Message box window title 
+         window.msg.setWindowTitle("Information MessageBox") 
+      
+      # declaring buttons on Message Box 
+         window.msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel) 
+      
+      # start the app 
+         retval = window.msg.exec_() 
+
+   def CreateClic(self):
+      strp=self.TextEdit2.text()                                                     
+      DirectoriDoc(strp)
+>>>>>>> 26b0df96911c86a4753907f449ddbbd36239bbdf
 
 if __name__ == '__main__':
    app = QApplication(sys.argv)
