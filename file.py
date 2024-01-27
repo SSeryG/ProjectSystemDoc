@@ -6,8 +6,8 @@ import os
 import asyncio
 import time
 
-
-
+indexfile=[]
+clustersfile=[]
 
 def Data(file,p):#прочтение документов
     if (p[1]=='.pdf'):
@@ -64,14 +64,15 @@ def ChekingNone(List,predfile,file):
 
     
 def AbsolutePath(path):#обход по папкам
-    number=1
     tic = time.perf_counter()
     listfiles=WalkDir(path)
     smallfile,bigfile=ChekingSize(listfiles)    
     artext=WalkList(smallfile)
     artext1=WalkList(bigfile)
     bigvector=TFidfVector(artext1)
-    Cluster(TFidfVector(artext),artext1)
+    indexfile.append(smallfile)
+    indexfile.append(bigfile)
+    clustersfile=Cluster(TFidfVector(artext),bigvector)
     
     #print(klast)
     
@@ -80,9 +81,17 @@ def AbsolutePath(path):#обход по папкам
 
     
     
-def DirectoreDoc(twopath):
+def CreateDirectory(twopath):
     twopath=os.path.join(twopath,'dir')
     os.mkdir(twopath)
+    for cluster in clustersfile:
+        pathcluster=twopath+"\\cluster_%i"%cluster     
+        if(not os.path.isdir(pathcluster)):  
+            os.mkdir(pathcluster)        
+        for file in indexfile:
+            os.rename(file,pathcluster)
+
+
     
 
 #path='F:/'

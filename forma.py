@@ -4,7 +4,7 @@ from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
 from file import AbsolutePath
-from file import DirectoreDoc
+from file import CreateDirectory
 
 
 
@@ -95,7 +95,7 @@ class window(QWidget):
 
    def CreateClic(self):
       strp=self.TextEdit2.text()                                                     
-      #DirectoriDoc(strp)
+      CreateDirectory(strp)
 
 if __name__ == '__main__':
    app = QApplication(sys.argv)

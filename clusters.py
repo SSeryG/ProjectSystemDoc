@@ -7,7 +7,7 @@ from nltk import ngrams
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+model=AgglomerativeClustering(distance_threshold=1.5,n_clusters=None)
 
 
 def TFidfVector(artext):#построение и вычисление частотности
@@ -19,19 +19,15 @@ def TFidfVector(artext):#построение и вычисление часто
     tokens=None
     tokens=[]
     return df_tfidf
-    
-def Cluster(X,x_predict):
-    model=AgglomerativeClustering(distance_threshold=1.5,n_clusters=None,metric='euclidean')
+
+def Cluster(X):    
+    labels=model.fit_predict(X)
+    return labels
+
+def Cluster(X,x_predict):    
     labels=model.fit_predict(X)
     print(labels)
-    #fig=plt.figure(figsize=(25,30))
-    #dn = dendrogram(labels)
-    #plt.show()
-    
-    labels = model.fit_predict(x_predict)
-    
-    print(labels)
-    #dn = dendrogram(labels)
 
-    #X['cluster']=fcluster(Z,3,criterion='distance')
+    labels = model.fit_predict(x_predict)
+    return labels
 
