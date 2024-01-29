@@ -7,9 +7,6 @@ from PyQt5.QtWidgets import *
 from file import FileClass
 
 
-
-
-
 class window(QWidget):   
    def __init__(self, parent = None):
       self.file=FileClass()
@@ -77,7 +74,7 @@ class window(QWidget):
       dirlist = QFileDialog.getExistingDirectory(self,"Выбрать папку",".")
       self.TextEdit2.setText(dirlist)
     
-   def PuskClic(self):
+   def PuskClic(self):#запуск обхода папок
       #try:
          strp=self.TextEdit1.text()                                                              
          self.file.AbsolutePath(strp)
@@ -96,7 +93,7 @@ class window(QWidget):
       # start the app 
          #retval = window.msg.exec_() 
 
-   def CreateClic(self):
+   def CreateClic(self):#создание папок
       strp=self.TextEdit2.text()                                                           
       self.file.CreateDirectory(strp)
 
