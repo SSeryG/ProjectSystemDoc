@@ -11,7 +11,6 @@ from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 from nltk.stem import SnowballStemmer
 import re
-from pymystem3 import Mystem
 from pymorphy3 import MorphAnalyzer
 
 import time
@@ -28,11 +27,6 @@ stopw.extend(['стало','иначе','каждом','таким','кажды�
 
 def Steemm(text,stemmer=SnowballStemmer('russian')):#выделаение основы
     return [stemmer.stem(s) for s in text]
-    
-def LemmatizeMystem(text,mys=Mystem()):#выделение схожих слов
-    text= mys.lemmatize(' '.join(text)) 
-    text =[w for w in text if w.strip()]
-    return text
 
 def LemmatizeMorphWord(token,morph=MorphAnalyzer()):
     return morph.parse(token)[0].normal_form
@@ -59,11 +53,8 @@ def Token(text):#выделение токенов
         text=SumRe(text)
                
         text=[w for w in text if not w in stopw and len(w)>3]
-<<<<<<<<< Temporary merge branch 1
-        print(text) 
-=========
-        #print(text) 
->>>>>>>>> Temporary merge branch 2
+
+
         text=LemmatizeMorphText(text)
         
     
