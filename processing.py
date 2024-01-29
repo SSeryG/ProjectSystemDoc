@@ -59,7 +59,11 @@ def Token(text):#выделение токенов
         text=SumRe(text)
                
         text=[w for w in text if not w in stopw and len(w)>3]
+<<<<<<<<< Temporary merge branch 1
+        print(text) 
+=========
         #print(text) 
+>>>>>>>>> Temporary merge branch 2
         text=LemmatizeMorphText(text)
         
     
