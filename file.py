@@ -1,13 +1,44 @@
 from read import ReadPdf,ReadDoc,ReadDocx
 import pandas as pd
 from IPython.display import display
-from clusters import TFidfVector,Cluster
+from clusters import TFidfVector,OneCluster,TwoCluster
 import os
 import asyncio
 import time
 
-indexfile=[]
-clustersfile=[]
+class FileClass(object):
+    def __init__(self):
+        self.clustersfile = []
+        self.listfiles= []
+
+    def AbsolutePath(self,path):#обход по папкам
+        tic = time.perf_counter()
+        self.listfiles=WalkDir(path)
+        smallfile,bigfile=ChekingSize(self.listfiles)                
+        if len(WalkList(bigfile))>1:        
+            smallvector=TFidfVector(WalkList(smallfile))
+            bigvector=TFidfVector(WalkList(bigfile))
+            self.clustersfile=TwoCluster(smallvector,bigvector)
+        else:
+            artext=WalkList(self.listfiles)       
+            vector=TFidfVector(artext)               
+            self.clustersfile=OneCluster(vector)        
+        toc = time.perf_counter()
+        print(f"Вычисление заняло {toc - tic:0.4f} секунд")
+    
+    def CreateDirectory(self,twopath):
+        twopath=os.path.join(twopath,'dir')
+        print(self.listfiles)
+        print(self.clustersfile)
+        print(''.split(twopath)[1])
+        os.mkdir(twopath)
+        for cluster in range(len(self.clustersfile)):
+            pathcluster=os.path.join(twopath,"cluster_%i"%(self.clustersfile[cluster]))     
+            if(not os.path.isdir(pathcluster)):  
+                os.mkdir(pathcluster)            
+            print(self.listfiles[cluster])
+            print(pathcluster)    
+            os.rename(self.listfiles[cluster],pathcluster)
 
 def Data(file,p):#прочтение документов
     if (p[1]=='.pdf'):
@@ -61,39 +92,7 @@ def ChekingNone(List,predfile,file):
     else :
         List.remove(file)
         return False
-
     
-def AbsolutePath(path):#обход по папкам
-    tic = time.perf_counter()
-    listfiles=WalkDir(path)
-    smallfile,bigfile=ChekingSize(listfiles)    
-    artext=WalkList(smallfile)
-    artext1=WalkList(bigfile)
-    bigvector=TFidfVector(artext1)
-    indexfile.append(smallfile)
-    indexfile.append(bigfile)
-    clustersfile=Cluster(TFidfVector(artext),bigvector)
-    
-    #print(klast)
-    
-    toc = time.perf_counter()
-    print(f"Вычисление заняло {toc - tic:0.4f} секунд")
-
-    
-    
-def CreateDirectory(twopath):
-    twopath=os.path.join(twopath,'dir')
-    os.mkdir(twopath)
-    for cluster in clustersfile:
-        pathcluster=twopath+"\\cluster_%i"%cluster     
-        if(not os.path.isdir(pathcluster)):  
-            os.mkdir(pathcluster)        
-        for file in indexfile:
-            os.rename(file,pathcluster)
-
-
-    
-
 #path='F:/'
 #twopath='C:/Users/Сергей/Desktop/reader/dir/dir'
 #AbsolutePath(twopath)

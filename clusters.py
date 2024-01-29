@@ -20,11 +20,13 @@ def TFidfVector(artext):#построение и вычисление часто
     tokens=[]
     return df_tfidf
 
-def Cluster(X):    
+def OneCluster(X):    
     labels=model.fit_predict(X)
+    print(labels)
+
     return labels
 
-def Cluster(X,x_predict):    
+def TwoCluster(X,x_predict):    
     labels=model.fit_predict(X)
     print(labels)
 

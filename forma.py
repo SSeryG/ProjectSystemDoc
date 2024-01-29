@@ -3,13 +3,14 @@ import os
 from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
-from file import AbsolutePath
-from file import CreateDirectory
+from file import FileClass
 
 
 
-class window(QWidget):
+
+class window(QWidget):   
    def __init__(self, parent = None):
+      self.file=FileClass()
       super(window, self).__init__(parent)
       window.msg = QMessageBox()       
       self.resize(350,350)
@@ -76,8 +77,8 @@ class window(QWidget):
     
    def PuskClic(self):
       #try:
-         strp=self.TextEdit1.text()                                                     
-         AbsolutePath(strp)
+         strp=self.TextEdit1.text()                                                              
+         self.file.AbsolutePath(strp)
       #except:         
        #  window.msg.setIcon(QMessageBox.Information) 
   
@@ -94,8 +95,8 @@ class window(QWidget):
          #retval = window.msg.exec_() 
 
    def CreateClic(self):
-      strp=self.TextEdit2.text()                                                     
-      CreateDirectory(strp)
+      strp=self.TextEdit2.text()                                                           
+      self.file.CreateDirectory(strp)
 
 if __name__ == '__main__':
    app = QApplication(sys.argv)
