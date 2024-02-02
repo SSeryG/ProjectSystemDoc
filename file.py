@@ -1,8 +1,7 @@
 from read import ReadPdf,ReadDoc,ReadDocx
 import pandas as pd
 from IPython.display import display
-from clusters import TFidfVector,OneCluster,TwoCluster
-
+from clusters import ClustersClass,TFidfVector
 import os
 import asyncio
 import time
@@ -11,36 +10,33 @@ class FileClass(object):
     def __init__(self):
         self.clustersfile = []
         self.listfiles= []
+        self.clusters=ClustersClass()
+
 
 
     def AbsolutePath(self,path):#обход по папкам
         tic = time.perf_counter()
         self.listfiles=WalkDir(path)
         smallfile,bigfile=ChekingSize(self.listfiles)                
-        if len(WalkList(bigfile))>1:        
-            smallvector=TFidfVector(WalkList(smallfile))
-            bigvector=TFidfVector(WalkList(bigfile))
-            self.clustersfile=TwoCluster(smallvector,bigvector)
-        else:
-            artext=WalkList(self.listfiles)       
-            vector=TFidfVector(artext)               
-            self.clustersfile=OneCluster(vector)        
+        smallvector=TFidfVector(WalkList(smallfile))            
+        self.clustersfile=self.clusters.OneCluster(smallvector)
+            
         toc = time.perf_counter()
         print(f"Вычисление заняло {toc - tic:0.4f} секунд")
     
     def CreateDirectory(self,twopath):
-        twopath=os.path.join(twopath,'dir')
-        print(self.listfiles)
+        twopath=os.path.join(twopath,'dir')        
         print(self.clustersfile)
-        print(''.split(twopath)[1])
         os.mkdir(twopath)
         for cluster in range(len(self.clustersfile)):
             pathcluster=os.path.join(twopath,"cluster_%i"%(self.clustersfile[cluster]))     
             if(not os.path.isdir(pathcluster)):  
                 os.mkdir(pathcluster)            
-            print(self.listfiles[cluster])
-            print(pathcluster)    
-            os.rename(self.listfiles[cluster],pathcluster)
+            doc=self.listfiles[cluster]            
+            namedoc=doc.split('\\')[1]
+            newpathdoc=os.path.join(pathcluster,namedoc)
+            print(newpathdoc)
+            os.rename(self.listfiles[cluster],newpathdoc)
 
 def Data(file,p):#прочтение документов
     if (p[1]=='.pdf'):
