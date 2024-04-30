@@ -5,29 +5,32 @@ import nltk
 #nltk.download('perluniprops')
 #nltk.download('universal_tagset')
 #nltk.download('stopwords')
-#nltk.download('nonbreaking_prefixes')s
+#nltk.download('nonbreaking_prefixes')
 #nltk.download('wordnet')
 from nltk.corpus import stopwords
-from nltk.probability import FreqDist
-from nltk.stem import SnowballStemmer
 import re
 from pymorphy3 import MorphAnalyzer
 #nltk.download('averaged_perceptron_tagger_ru')
-import time
 
 
 regex=re.compile("[А-Яа-я]+")
 
 stopw=stopwords.words('russian')#стоп слова
+stopw.extend(stopwords.words('english'))#будет время доработать
 stopw.extend(['сами','таких','иной','также','этим','этих','могут','которая','который','поэтому','само','которое','которыми'])
 stopw.extend(['любой','например','пример','наша','которого','глава','этими','каждого','ними','такую','которой', 'свой','такое'])
 stopw.extend(['которые','рисунок','таблица','которых','котором','какие','каком','какого','этому','либо','запятая', 'многом'])
 stopw.extend(['одной','должны','однако','могли','очень','нужно','одного','должно','вашего','можете','разных','такие','вашем'])
 stopw.extend(['стало','иначе','каждом','таким','каждый','такая','затем','причем','несколько','будем','будут','важными','важно'])
-stopw.extend(['важных','одним','любом','двух','число','вторая','второго','первый','каждое','разной','','','','','',''])
+stopw.extend(['важных','одним','любом','двух','число','вторая','второго','первый','каждое','разной','каким','какието','каких'])
+stopw.extend(['никаких','какиелибо','какиминибудь','какихто','никакие','какихлибо','изза','какую','какими','какова','никакой'])
+stopw.extend(['какойлибо','какому','своему','каких','каково','какомто','какое','никакого','каковы','какаято','какимто'])
+stopw.extend(['какоето','каков','каждой','вами','всем','свои','ваши','своих','вашей','самые','кроме','должен','попытаться'])
+stopw.extend(['некоторый','один','aaaaaaaaaa','самый','вопрос','таковой','вообще','смочь','мочь','решение','сложный'])
+stopw.extend(['сразу','возможно','десять','первый','большинство','должный','хотеть','иметь','номер','нужный','большой'])
 
-def Steemm(text,stemmer=SnowballStemmer('russian')):#выделаение основы    
-    return  [stemmer.stem(s) for s in text]
+
+#def Steemm(text,stemmer=SnowballStemmer('russian')):#выделаение основы    
 
 def LemmatizeMorphWord(token,morph=MorphAnalyzer()):
     return  morph.parse(token)[0].normal_form
@@ -39,36 +42,40 @@ def LemmatizeMorphText(text):#выделение схожих слов
 def SumRe(text):#удаление символов и понижение регистров
     text= re.sub(r'[0123456789+]','',text)
     text= re.sub('-\n','',text)
-    text= re.sub('-','',text)
+    text= re.sub('-',' ',text)
     text= re.sub('\n',' ',text)
     text= text.lower()
     text= regex.findall(text)
     return text
 
-def Token(text):
+async def Token(text):
     if (text is not None):
-        tic = time.perf_counter()
+        #tic = time.perf_counter()
            
         text=' '.join(SumRe(text))
                
         #print(text)
          
         words = nltk.word_tokenize(text)
-        functors_pos = {'CONJ', 'ADV-PRO', 'CONJ', 'PART'}  # function words
+        functors_pos = {'CONJ','PR','S-PRO','ADV-PRO','A-PRO','ADV','A-PRO=f','A-PRO=n','A-PRO=m','NUM'
+                ,'NUM=acc','NUM=m','A=m','PRAEDIC','PART','ANUM=m','PARENT','ADV-PRO=abbr','A-PRO=pl'
+                ,'ANUM=f','A-PRO=m','ADV=comp'}  # function words
 
         text=[word for word, pos in nltk.pos_tag(words, lang='rus')if pos not in functors_pos]
         #print(text)
          
-        text=[w for w in text if not w in stopw and len(w)>3]  
+        
 
-        text=LemmatizeMorphText(text)
+        token=LemmatizeMorphText(text)
         
-        text=Steemm(text)
+        #text=Steemm(text)
+        token=[w for w in token if not w in stopw and len(w)>3]  
         
-        token=' '.join(text)
+        token=' '.join(token)       
+        
         #print(text)
-        toc = time.perf_counter()
-        print(f"Вычисление заняло {toc - tic:0.4f} секунд")
+        #toc = time.perf_counter()
+        #print(f"Вычисление заняло {toc - tic:0.4f} секунд")
         
     return token
 
