@@ -1,26 +1,25 @@
 import os
 from tkinter import *
-
 import tkinter.filedialog as fd
-
 from file import FileClass
 import errorbox
 from threading import Thread
-import time
 import asyncio
+from tkinter import ttk
+import time
 
 
 class App(Tk):
    def __init__(self):  
       self.file=FileClass()
       super().__init__()        
-      self.title('Систематизация файлов')
+      self.title('Систематизация файлов')      
       self.minsize(319,349)
       self.maxsize(321,351)
       self.geometry('320x350')  
       self.labelinputpath=Label(self,font='Arial 9',text="Выберите файлы")
       self.labelinputpath.place(x = 40,y = 70)
-
+      
       self.entryinputpath=Entry(self,font='Arial 10')
       self.entryinputpath.place(x = 40,y = 90,width=200,height=15)
       self.entryinputpath.insert(0,"C:/Dekstop/dir")
@@ -79,18 +78,22 @@ class App(Tk):
       
       self.clean=Button(
          self,
-         text="очистить кэш",
+         text="очистить данные",
          command=self.CleanData
       )
       self.clean.place(x=40,y=40,width=100,height=20)
          
-  
+      self.statpusk=False
+      self.statcreatefile=False
 
 
    def CleanData(self):
       if errorbox.Info():
          try:
-            os.remove("data/data.csv")
+            if self.statpusk==True or self.statcreatefile==True:
+               errorbox.ErrorDataProcces()
+            else:
+               os.remove("data/data.csv")
          except:
             errorbox.ErrorData()
 
@@ -112,40 +115,61 @@ class App(Tk):
       self.entrytransferpath.insert(0,self.directory)
 
    def ClicPusk(self):
-      path=self.entryinputpath.get()
+      if self.statcreatefile==True:
+         errorbox.ErrorButtonPuskProcces()
+      else:
+         self.statpusk=True
+         path=self.entryinputpath.get()
+         self.progress=ttk.Progressbar(orient="horizontal", length=240, value=0)
       #try:         
-      asyncio.run(self.file.AbsolutePath(path))
+         threadpusk=Thread(target=self.file.AbsolutePath,args=(path,self.progress),daemon=False)
       
-      #thread.start()
-      #self.file.AbsolutePath(path)
-      #self.pusk.config(relief=RAISED)
-      #self.title("(Загружает файлы...)")
-
-      #time.sleep(5)  # Имитация длительной операции
-      #if thread.is_alive:
-      #   self.title("Систематизация файлов")
-      #   self.pusk.config(relief=SUNKEN)
+      
+         self.progress.place(x=40,y=280)
+         threadpusk.start()    
+         while threadpusk.is_alive():
+            self.pusk.config(relief=SUNKEN)
+            self.title("Загрузка файлов...")
+            self.update()  # Обновление интерфейса
+            time.sleep(0.1)
+                  
+         self.progress.place_forget()
+   
+         time.sleep(5)  # Имитация длительной операции
+      
+         self.title("Систематизация файлов")
+         self.pusk.config(relief=RAISED)
+         self.statpusk=False
       #except:         
         # errorbox.ErrorPath(path)
 
 
    def ClicCreate(self):
-
-      path=self.entrytransferpath.get()
-      #try:         
-      asyncio.run(self.file.CreateDirectory(path))
+      if self.statpusk==True:
+         errorbox.ErrorButtonCreateProcces()
+      else:
+         self.statcreatefile=True
+         path=self.entrytransferpath.get()
+         #try:         
+         threadcreaty=Thread(target=self.file.CreateDirectory,args=(path,),daemon=False)
+         #self.progress.place(x=40,y=280)
+         threadcreaty.start()    
+         while threadcreaty.is_alive():
+            self.createfile.config(relief=SUNKEN)
+            self.title("Систематизируем файлы")
+            self.update()  # Обновление интерфейса
+            time.sleep(0.1)
+         
+         #self.progress.place_forget()
+   
+         time.sleep(5)  # Имитация длительной операции
       
-      ##self.file.AbsolutePath(path)
-      #self.pusk.config(relief=RAISED)
-      #self.title("(Систематизирует файлы...)")
+         self.title("Систематизация файлов")
+         self.createfile.config(relief=RAISED)
+         self.statcreatefile=False
 
-      #time.sleep(5)  # Имитация длительной операции
-      #if thread.is_alive:
-       #  self.title("Систематизация файлов")
-        # self.pusk.config(relief=SUNKEN)
-      
-      #except:         
-      #errorbox.ErrorPath(path)
+         #except:         
+         #errorbox.ErrorPath(path)
 
 if __name__=="__main__":
    app=App()

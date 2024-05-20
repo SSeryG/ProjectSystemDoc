@@ -1,5 +1,5 @@
-from read import ReadPdf,ReadDoc,ReadDocx
-from clusters import ClustersClass,TFidfVector
+from read import ReadPdf,ReadDoc,ReadDocx,ReadOdf
+from clusters import ClustersClass
 import os
 import asyncio
 
@@ -9,78 +9,98 @@ class FileClass(object):
     def __init__(self):
         self.clustersfile = []
         self.listfiles= []
-        self.clusters=ClustersClass()        
+        self.clusters=ClustersClass()
+        self.progress=''        
 
-    async def AbsolutePath(self,path):#обход по папкам       
-        self.listfiles=WalkDir(path)
+    def AbsolutePath(self,path,progress):#обход по папкам      
+        self.progress=progress
+        self.listfiles=self.WalkDir(path)
         if(self.listfiles is not None):
-            smalllist=await WalkList(self.listfiles)            
-            smallvector=TFidfVector(smalllist,self.listfiles)     
+            smalllist=self.WalkList()
+
+            smallvector=self.clusters.TFidfVector(smalllist,self.listfiles)     
             self.listfiles=smallvector.index
             
-            self.clusters.LoadingFiles(smallvector)
+            asyncio.run(self.clusters.LoadingFiles(smallvector))
             
 
     def CreateDirectory(self,twopath):
-        self.clustersfile=self.clusters.Clusterization()
-        self.clustersfile=self.clustersfile[len(self.clustersfile)-1-(len(self.listfiles)-1):]
+        self.clustersfile=asyncio.run(self.clusters.Clusterization())
+        self.listfiles=asyncio.run(self.clusters.IndexCSV())
+        newlistfiles=[]
         twopath=os.path.join(twopath,'dir')                
         
         if(not os.path.isdir(twopath)):
-            os.mkdir(twopath)
-        for cluster in range(len(self.clustersfile)):
-            pathcluster=os.path.join(twopath,"cluster_%i"%(self.clustersfile[cluster]))     
-            if(not os.path.isdir(pathcluster)):  
-                os.mkdir(pathcluster)            
-            doc=self.listfiles[cluster]            
-            namedoc=doc.split('\\')
-            namedoc=namedoc[len(namedoc)-1]
-            newpathdoc=os.path.join(pathcluster,namedoc)
-            os.rename(self.listfiles[cluster],newpathdoc)
+           os.mkdir(twopath)
+        for cluster in range(len(self.clustersfile)):            
+            newlistfiles.append(self.CreateClaster(cluster,twopath))
+        print(newlistfiles)
+        asyncio.run(self.clusters.ReWriteIndexCSV(newlistfiles))
+    
+    def CreateClaster(self,cluster,twopath):
+        
+        pathcluster=os.path.join(twopath,"cluster_%i"%(self.clustersfile[cluster]+1))     
+        if(not os.path.isdir(pathcluster)):  
+            os.mkdir(pathcluster)            
+        doc=self.listfiles[cluster]            
+        namedoc=doc.split('\\')
+        namedoc=namedoc[len(namedoc)-1]
+        newpathdoc=os.path.join(pathcluster,namedoc)            
+        os.rename(self.listfiles[cluster],newpathdoc)
+        return newpathdoc
 
 
-async def Data(file,p):#прочтение документов
-    if (p[1]=='.pdf'):
-        return await ReadPdf(file)#
-    elif (p[1]=='.docx'):
-        return await ReadDocx(file)#
-    elif (p[1]=='.doc'):        
-        return await ReadDoc(file)#
+    def Data(self,file,p):#прочтение документов
+        if (p[1]=='.pdf'):
+            return ReadPdf(file)#
+        elif (p[1]=='.docx'):
+            return ReadDocx(file)#
+        elif (p[1]=='.doc'):        
+            return ReadDoc(file)#
+        elif (p[1]=='.odf'):        
+            return ReadOdf(file)#
 
 
-def Exeption(p):
-    if(p[1]=='.pdf'or p[1]=='.docx'or p[1]=='.doc'):   
-        return True
-    else:
-        return False
+    def Exeption(self,p):
+        if(p[1]=='.pdf'or p[1]=='.docx'or p[1]=='.doc' or p[1]=='.odf'):   
+            return True
+        else:
+            return False
 
 
-def WalkDir(path):
-    listfiles=[]
-    for dirs,folden,files in os.walk(path):
-        for file in files:          
-            if Exeption(os.path.splitext(file)):
-                listfiles.append(os.path.join(dirs,file))
-    return  listfiles
+    def WalkDir(self,path):
+        listfiles=[]
+        for dirs,folden,files in os.walk(path):
+            for file in files:          
+                if self.Exeption(os.path.splitext(file)):
+                    listfiles.append(os.path.join(dirs,file))
+        return  listfiles
 
 
-async def WalkList(List):    
-    artext=[]
-    for file in List:
-        p=os.path.splitext(file)
-        predfile=await Data(file,p)
-        if (ChekingNone(List,predfile,file)):
-            artext.append(predfile)
-            predfile=None
-    return artext
+    def WalkList(self):  
+        progrssfile=100/len(self.listfiles)
+        progvalue=progrssfile
+        artext=[]
+        for file in self.listfiles:
+            p=os.path.splitext(file)        
+            predfile=self.Data(file,p)
+            self.progress["value"]=progvalue
+            if (self.ChekingNone(predfile,file)):
+                self.progress["value"]=progvalue                            
+                artext.append(predfile)
+                predfile=None
+            progvalue+=progrssfile
+                
+        return artext
     
 
-def ChekingNone(List,predfile,file):
-    if (predfile is not None):
-        return True
-    else :
-        List.remove(file)
-        return False
+    def ChekingNone(self,predfile,file):
+        print(predfile)
+        if (predfile is not None):
+            return True
+        else :
+            self.listfiles.remove(file)
+            return False
 
     
     
